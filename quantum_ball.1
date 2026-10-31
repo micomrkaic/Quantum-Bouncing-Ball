@@ -1,0 +1,100 @@
+.TH QUANTUM_BALL 1 "October 2026" "quantum_ball 2.0" "User Commands"
+.SH NAME
+quantum_ball \- classical and quantum ball bouncing in a box under gravity
+.SH SYNOPSIS
+.B quantum_ball
+.RB [ \-\-mode
+.IR classical | quantum | eigen ]
+.RB [ \-\-state
+.IR N,M ]
+.RB [ \-\-frames
+.IR COUNT ]
+.RB [ \-\-record
+.IR DIR ]
+.br
+.B quantum_ball
+.BR \-\-selftest " | " \-\-version " | " \-h
+.SH DESCRIPTION
+.B quantum_ball
+is an interactive SDL2 demonstration of the same problem solved classically
+and quantum mechanically: a particle in a rectangular box with hard walls
+under constant gravity. Units are normalised (hbar = m = 1); gravity points
+down the screen, so the potential is V = \-g y and the floor is the bottom
+wall.
+.TP
+.B Classical mode
+A point mass with elastic wall bounces. The panel shows its energy and the
+drift since the last reset.
+.TP
+.B Quantum mode
+A Gaussian wave packet launched with the same angle and speed, evolved with
+the time-dependent Schrodinger equation by Strang split-step propagation in
+a sine (DST-I) pseudospectral basis, which builds the hard walls into the
+basis. The method is unitary; the panel shows the norm, the energy
+expectation and its drift. The white dot marks <x>,<y>.
+.TP
+.B Eigenstate mode
+The stationary states psi_{N,M}(x,y) = sin(N pi x / Lx) phi_M(y). The
+vertical part is computed by Numerov shooting. For strong gravity these are
+the Airy states of the quantum bouncer: the panel shows the exact energy and
+the Airy approximation E = Ex \- g Ly + |a_M| (g^2/2)^(1/3), where a_M is the
+M-th zero of Ai. The arrow keys change N (left/right) and M (up/down).
+.SH OPTIONS
+.TP
+.BI \-\-mode " M"
+Start in the given mode (default classical).
+.TP
+.BI \-\-state " N,M"
+Start in eigenstate mode showing psi_{N,M}.
+.TP
+.BI \-\-frames " COUNT"
+Run that many frames and exit. With
+.B \-\-record
+the frame time is fixed at 1/60 s so the output is deterministic.
+.TP
+.BI \-\-record " DIR"
+Write every frame to DIR/frame_NNNNN.ppm. Works without a display:
+.B SDL_VIDEODRIVER=dummy quantum_ball \-\-record ...
+.TP
+.B \-\-selftest
+Without opening a window, propagate a packet for 3000 steps and check that
+the norm and energy are conserved, and compute three eigenstates and check
+that they are stationary. Exit status 0 on success.
+.TP
+.BR \-\-version ", " \-h
+Print the version or usage and exit.
+.SH CONTROLS
+.TP
+.B Mouse
+Sliders set launch angle, speed, gravity and box size (any change resets).
+Buttons switch modes, reset and pause.
+.TP
+.B Keys
+.B C
+classical,
+.B Q
+quantum,
+.B E
+eigenstates,
+.B R
+reset,
+.B Space
+pause,
+.B Esc
+quit. In eigenstate mode the
+.B arrow keys
+select the quantum numbers.
+.SH NUMERICS
+The grid has 20 points per unit length (clamped to 120\-400 by 80\-320) and
+the time step is 0.0022 with three steps per frame. The default packet has
+momentum 28, i.e. about 4.5 grid points per wavelength. Higher speeds need a
+finer grid; the display will show it when the wavelength is under-resolved.
+.PP
+The split-step method conserves the norm exactly and the energy to O(dt^2);
+in double precision the self-test reports a norm drift of about 1e-13 and an
+energy drift of about 1e-7 over 3000 steps.
+.SH SEE ALSO
+Nesvizhevsky et al., "Quantum states of neutrons in the Earth's
+gravitational field", Nature 415, 297 (2002), for the real quantum bouncer.
+.SH AUTHOR
+Mico Mrkaic. GPL-3.0-or-later.
